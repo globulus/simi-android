@@ -14,7 +14,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ActiveSimi.load(readAssets("Stdlib.simi") + "\n\n" + readAssets("Calc.simi"))
+        ActiveSimi.setImportResolver {
+            application.assets.open(it).bufferedReader().use { it.readText() }
+        }
+        ActiveSimi.load("Calc.simi")
 
         val left = findViewById<EditText>(R.id.left)
         val op = findViewById<EditText>(R.id.op)
@@ -24,12 +27,8 @@ class MainActivity : AppCompatActivity() {
             val l = left.text.toString().toDouble()
             val r = right.text.toString().toDouble()
             val o = op.text.toString()
-            val res = ActiveSimi.eval("Calc", "compute", SimiValue.Number(l), SimiValue.String(o), SimiValue.Number(r));
-            Toast.makeText(baseContext, res.toString(), Toast.LENGTH_LONG).show();
+            val res = ActiveSimi.eval("Calc", "compute", SimiValue.Number(l), SimiValue.String(o), SimiValue.Number(r))
+            Toast.makeText(baseContext, res.toString(), Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun readAssets(filename: String): String {
-        return application.assets.open(filename).bufferedReader().use { it.readText() }
     }
 }
