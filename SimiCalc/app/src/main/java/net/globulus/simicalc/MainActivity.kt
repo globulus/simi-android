@@ -16,6 +16,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.io.File
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,9 +25,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ActiveSimi.setImportResolver {
-            application.assets.open(it).bufferedReader().use { it.readText() }
-        }
+        ActiveSimi.setImportResolver(object : ActiveSimi.ImportResolver {
+            override fun readFile(path: String): String {
+                return application.assets.open(path).bufferedReader().use { it.readText() }
+            }
+
+            override fun useApiClassName(path: String): Boolean {
+                return false
+            }
+
+            override fun resolve(s: String): URL {
+                val fileName = s.substring(s.lastIndexOf('/') + 1)
+                val libMain = File(getDir("libs", 0), fileName)
+                return libMain.toURL()
+            }
+
+        })
         ActiveSimi.load("Calc.simi", "RedditStats.simi")
 
         val left = findViewById<EditText>(R.id.left)
@@ -57,9 +72,9 @@ class MainActivity : AppCompatActivity() {
                     Log.e("SimiCalc", json)
                     ActiveSimi.evalAsync(ActiveSimi.Callback { parsed ->
                         val sb = StringBuilder("Top posters:\n\n")
-                        for ((key, value) in SimiMapper.fromObject(parsed.value.`object`)) {
-                            sb.append(key).append(" with ").append(value).append(" comments\n")
-                        }
+//                        for ((key, value) in SimiMapper.fromObject(parsed.value.`object`)) {
+//                            sb.append(key).append(" with ").append(value).append(" comments\n")
+//                        }
                         responseView.setText(sb.toString())
                     },"RedditStats", "getStats", SimiMapper.toSimiProperty(json))
                 } else {

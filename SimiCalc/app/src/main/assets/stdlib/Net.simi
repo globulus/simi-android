@@ -3,20 +3,23 @@ import "./stdlib/Net-java.jar"
 class Net:
     KEYWORD_POST = "post *"
 
-    native post(request, callback): pass
+    def get(request, callback): native
+    def post(request, callback): native
+    def put(request, callback): native
+    def delete(request, callback): native
 
     def go(f):
         common = Async.KEYWORD + " Net."
         lines = (ivic f).replacing(@KEYWORD_POST, common + "post(").split("\n").clone(false)
         $open = 0
         for e in lines.enumerate():
-            [key, value] = e
-            if value.endsWith("["): $open = $open + 1
-            elsif value.endsWith("]"):
+            [i, line] = e
+            if line.endsWith("["): $open = $open + 1
+            elsif line.endsWith("]"):
                 $open = $open - 1
-                if $open == 0: lines.(key) = value + ")"
+                if $open == 0: lines.(i) = line + ")"
             end
-            elsif common in value: lines.(key) = value + ")"
+            elsif common in line: lines.(i) = line + ")"
         end
         return gu Async.swl(lines)
     end
@@ -36,7 +39,7 @@ class Net:
 #            $line = lines.(i)
 #            if @KEYWORD_POST in $line:
 #                if i > start:
-#                    $prepend += $String.from(lines.slice(start, i + 1), "\n") + "\n"
+#                    $prepend += String.from(lines.slice(start, i + 1), "\n") + "\n"
 #                end
 #                $jump = 1
 #                if $line.endsWith("["):
@@ -47,7 +50,7 @@ class Net:
 #                        elsif otherLine.startsWith("]"):
 #                            if $opens == 0:
 #                                $jump = j - i + 2
-#                                $line = $String.from(lines.slice(i, j + 2), " ")
+#                                $line = String.from(lines.slice(i, j + 2), " ")
 #                                break
 #                            end
 #                            else: $opens = $opens - 1
@@ -57,7 +60,7 @@ class Net:
 #                return $prepend + @_makePost(tempName + start, $line) + @_process(lines, i + $jump, tempName) + "\nend)"
 #            end
 #        end
-#        return $prepend + $String.from(lines.slice(start, lines.len()), "\n")
+#        return $prepend + String.from(lines.slice(start, lines.len()), "\n")
 #    end
 #
 #    def _makePost(name, line):

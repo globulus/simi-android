@@ -34,11 +34,7 @@ SimiCalc/captures/
 
 # Intellij
 *.iml
-SimiCalc/.idea/workspace.xml
-SimiCalc/.idea/tasks.xml
-SimiCalc/.idea/gradle.xml
-SimiCalc/.idea/dictionaries
-SimiCalc/.idea/libraries
+SimiCalc/.idea/
 
 # Keystore files
 *.jks
